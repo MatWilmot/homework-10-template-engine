@@ -57,70 +57,44 @@ function createEmployee() {
         when: (answers) => answers.type === "Intern",
       },
     ])
-    .then(function (res) {
+    .then((res) => {
       if (res.type === "Manager") {
         employeeArray.push(
-          new Manager(res.name, res.email, res.id, res.office)
+          new Manager(res.name, res.id, res.email, res.office)
         );
       } else if (res.type === "Engineer") {
         employeeArray.push(
-          new Engineer(res.name, res.email, res.id, res.github)
+          new Engineer(res.name, res.id, res.email, res.github)
         );
       } else if (res.type === "Intern") {
-        employeeArray.push(new Intern(res.name, res.email, res.id, res.school));
+        employeeArray.push(new Intern(res.name, res.id, res.email, res.school));
       }
 
       inquirer
         .prompt({
           name: "addMore",
-          message: "Add another employee?",
+          message: "Done!\nAdd another employee?",
           type: "confirm",
         })
         .then((res) => {
           if (res.addMore) {
             createEmployee();
           } else {
-            console.log("Done!");
-            console.log("Here's the employee array:", employeeArray);
+            const data = render(employeeArray);
+            fs.writeFile("./output/team.html", data, (err) => {
+              if (err) {
+                throw err;
+              } else {
+                console.log("Saved!");
+              }
+            });
           }
         });
-      // use 'when' in the questions to ask department specific question, then use conditional to select type,
-      // and have it create new employee of res.type, with placeholders of responses, then push object to array variable
-      // if user would like to add another employee, run createEmployee()
-      // call render function with employee object array as placeholder
     });
 }
 
-// if (res.type === "Manager") {
-//   // ask manager question
-//   inquirer
-//     .prompt([
-//       {
-//         name: "office",
-//         message: "Enter Manager office number",
-//         type: "input",
-//       },
-//     ])
-//     .then(function (res) {
-//       console.log(res);
-//     });
-// } else if (res.type === "Engineer") {
-//   // ask Engineer question
-//   inquirer
-//     .prompt({
-//       name: "github",
-//       message: "Enter Engineer github username",
-//       type: "input",
-//     })
-//     .then(function (res) {
-//       console.log(res);
-//     });
-// } else if (res.type === "Intern") {
-//   // ask Intern question
-// }
-// });
-
 createEmployee();
+
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
 // generate and return a block of HTML including templated divs for each employee!
